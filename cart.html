@@ -8,11 +8,15 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js" integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN" crossorigin="anonymous"></script>
 	<link href="https://cdn.jsdelivr.net/npm/vue-loading-overlay@6/dist/css/index.css" rel="stylesheet">
+  <link rel="stylesheet" href="./css/cart.css">
   </head>
   <body>
     <div id="app">
-      <!-- LOADING -->
-      <loading v-model:active="isLoading"></loading>
+      <loading v-model:active="isLoading">
+        <div class="loadingio-spinner-spin-fvg2beu6lsu"><div class="ldio-hrcspc4sjan">
+          <div><div></div></div><div><div></div></div><div><div></div></div><div><div></div></div><div><div></div></div><div><div></div></div><div><div></div></div><div><div></div></div>
+          </div></div>
+      </loading>
       <div class="container">
         <div class="mt-4">
           <!-- 產品Modal -->
@@ -146,16 +150,16 @@
             ref="form"
             class="col-md-6"
             v-slot="{ errors }"
-            @submit="onSubmit.prevent"
+            @submit="onSubmit"
           >
             <div class="mb-3">
               <label for="email" class="form-label">Email</label>
               <v-field id="email" name="email" type="email" class="form-control"
               placeholder="請輸入 Email" 
-              rules="email|required" 
-              :class="{ 'is-invalid': errors['email'] }"
-              v-model="user.email">
-            </v-field>      
+              rules="required|email"
+              :class="{'is-invalid':errors.email}"
+              v-model="user.email"
+              ></v-field>      
             <span name="email" class="invalid-feedback"></span>
           </div>   
           <div class="mb-3">
@@ -163,7 +167,7 @@
             <v-field id="name" name="姓名" type="text" class="form-control"
               placeholder="請輸入姓名"
               rules="required"
-              :class="{ 'is-invalid': errors['姓名'] }"
+              :class="{ 'is-invalid': errors.姓名 }"
               v-model="user.name"></v-field>
             <error-message name="姓名" class="invalid-feedback"></error-message>
           </div>
@@ -171,7 +175,7 @@
           <div class="mb-3">
             <label for="phone" class="form-label">電話</label>
             <!-- 使用 v-bind 綁定 :rules="isPhone" 綁定methods isPhone方法 -->
-            <v-field id="phone" name="電話" type="text" class="form-control"
+            <v-field id="phone" name="電話" type="tel" class="form-control"
                      placeholder="請輸入電話"
                      :rules="isPhone"
                      :class="{ 'is-invalid': errors['電話'] }"

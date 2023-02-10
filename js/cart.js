@@ -1,5 +1,5 @@
-console.log(VueLoading);
 import { createApp } from "https://cdnjs.cloudflare.com/ajax/libs/vue/3.2.29/vue.esm-browser.min.js";
+
 Object.keys(VeeValidateRules).forEach((rule) => {
   if (rule !== "default") {
     VeeValidate.defineRule(rule, VeeValidateRules[rule]);
@@ -56,14 +56,14 @@ const productModal = {
   },
 };
 
-const app = createApp({
+const app = Vue.createApp({
   data() {
     return {
       products: [],
       productId: "",
       //購物車
       cart: {},
-      isLoading: true,
+      isLoading: false,
       //操作完成才能在操作下一個動作
       loadingItem: "", //存id
       user: {
@@ -78,11 +78,13 @@ const app = createApp({
   methods: {
     //去得資料
     getProducts() {
+      this.isLoading = true;
       axios
         .get(`${url}/api/${path}/products/all`)
         .then((res) => {
           // console.log("產品列表", res.data.products);
           this.products = res.data.products;
+          this.isLoading = false;
         })
         .catch((err) => {
           console.error(err);
@@ -184,7 +186,7 @@ const app = createApp({
     this.getCarts();
   },
 });
-// app.component("loading", VueLoading.Component);
+app.component("loading", VueLoading.Component);
 // 元件註冊
 app.component("VForm", VeeValidate.Form);
 app.component("VField", VeeValidate.Field);
