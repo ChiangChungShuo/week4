@@ -18,7 +18,7 @@ const path = "azraelk";
 
 const productModal = {
   //當id變動時 取得遠端資料 呈現Modal
-  props: ["id", "addToCart"],
+  props: ["id", "addToCart", "openModal"],
   data() {
     return {
       modal: {},
@@ -32,16 +32,18 @@ const productModal = {
   watch: {
     id() {
       // console.log("productModal:", this.id);
-      axios
-        .get(`${url}/api/${path}/product/${this.id}`)
-        .then((res) => {
-          // console.log("單一產品", res.data.product);
-          this.tempProduct = res.data.product;
-          this.modal.show();
-        })
-        .catch((err) => {
-          console.error(err);
-        });
+      if (this.id) {
+        axios
+          .get(`${url}/api/${path}/product/${this.id}`)
+          .then((res) => {
+            // console.log("單一產品", res.data.product);
+            this.tempProduct = res.data.product;
+            this.modal.show();
+          })
+          .catch((err) => {
+            console.error(err);
+          });
+      }
     },
   },
   //關閉查看更多加入購物車後modal
@@ -52,7 +54,10 @@ const productModal = {
   },
   mounted() {
     this.modal = new bootstrap.Modal(this.$refs.modal);
-    // this.modal.show();
+    //監聽DOM 當Modal關閉時 要做其他事情
+    this.$refs.modal.addEventListener("hidden.bs.modal", (event) => {
+      this.openModal(""); //改ID
+    });
   },
 };
 
@@ -63,6 +68,7 @@ const app = Vue.createApp({
       productId: "",
       //購物車
       cart: {},
+      cartStatus: false,
       isLoading: false,
       //操作完成才能在操作下一個動作
       loadingItem: "", //存id
@@ -87,7 +93,7 @@ const app = Vue.createApp({
           this.isLoading = false;
         })
         .catch((err) => {
-          console.error(err);
+          alert(err.response.data.message);
         });
     },
     //點擊的時候打開Modal
@@ -109,9 +115,10 @@ const app = Vue.createApp({
           //關閉查看更多加入購物車後modal
           this.$refs.productModal.hide();
           this.getCarts();
+          alert(res.data.message);
         })
         .catch((err) => {
-          console.error(err);
+          alert(err.response.data.message);
         });
     },
     //取得購物車資料
@@ -121,9 +128,14 @@ const app = Vue.createApp({
         .then((res) => {
           // console.log("購物車", res.data);
           this.cart = res.data.data;
+          if (this.cart.carts.length === 0) {
+            this.cartStatus = false;
+          } else {
+            this.cartStatus = true;
+          }
         })
         .catch((err) => {
-          console.error(err);
+          alert(err.response.data.message);
         });
     },
     //購物車數量更改
@@ -139,10 +151,11 @@ const app = Vue.createApp({
         .then((res) => {
           // console.log("更新購物車", res.data);
           this.getCarts();
+          alert(res.data.message);
           this.loadingItem = "";
         })
         .catch((err) => {
-          console.error(err);
+          alert(err.response.data.message);
         });
     },
     //刪除購物車資料
@@ -153,10 +166,11 @@ const app = Vue.createApp({
         .then((res) => {
           // console.log("刪除購物車", res.data);
           this.getCarts();
+          alert(res.data.message);
           this.loadingItem = "";
         })
         .catch((err) => {
-          console.error(err);
+          alert(err.response.data.message);
         });
     },
     deleteAll() {
@@ -164,6 +178,7 @@ const app = Vue.createApp({
         .delete(`${url}/api/${path}/carts`)
         .then((res) => {
           this.getCarts();
+          alert(res.data.message);
         })
         .catch((err) => alert(err.response.data.message));
     },
@@ -171,7 +186,25 @@ const app = Vue.createApp({
       this.loadingItem = modalLoading;
     },
     onSubmit() {
-      console.log(this.user);
+      const data = {
+        user: this.user,
+        message: this.message,
+      };
+      if (this.cart.carts.length === 0) {
+        alert("購物車內還沒有商品唷～");
+        return;
+      }
+      axios
+        .post(`${url}/api/${path}/order`, { data })
+        .then((res) => {
+          alert(res.data.message);
+          this.$refs.form.resetForm();
+          this.getCarts();
+          this.message = "";
+        })
+        .catch((err) => {
+          alert(err.response.data.message);
+        });
     },
     isPhone(value) {
       const phoneNumber = /^(09)[0-9]{8}$/;
