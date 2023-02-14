@@ -73,8 +73,8 @@ const app = Vue.createApp({
       //操作完成才能在操作下一個動作
       loadingItem: "", //存id
       user: {
-        name: "",
         email: "",
+        name: "",
         tel: "",
         address: "",
       },
@@ -185,6 +185,10 @@ const app = Vue.createApp({
     changeLoading(modalLoading) {
       this.loadingItem = modalLoading;
     },
+    isPhone(value) {
+      const phoneNumber = /^(09)[0-9]{8}$/;
+      return phoneNumber.test(value) ? true : "需要正確的電話號碼";
+    },
     onSubmit() {
       const data = {
         user: this.user,
@@ -205,10 +209,6 @@ const app = Vue.createApp({
         .catch((err) => {
           alert(err.response.data.message);
         });
-    },
-    isPhone(value) {
-      const phoneNumber = /^(09)[0-9]{8}$/;
-      return phoneNumber.test(value) ? true : "需要正確的電話號碼";
     },
   },
   components: {
